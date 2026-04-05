@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:shop/types/HomeBannerTypes.dart';
 
@@ -13,8 +14,34 @@ class HomeBanner extends StatefulWidget {
 
 class _HomeBannerState extends State<HomeBanner> {
   int currentPage = 0;
-  final PageController _pageController = PageController(initialPage: 0);
-  getBanner() {}
+  final CarouselSliderController _carouselController =
+      CarouselSliderController();
+  Widget getBanner() {
+    final double width = MediaQuery.of(context).size.width;
+    return CarouselSlider(
+      carouselController: _carouselController,
+      items: List.generate(widget.bannerList.length, (index) {
+        return Image.network(
+          widget.bannerList[index].imageUrl,
+          width: width,
+          fit: BoxFit.cover,
+        );
+      }),
+      options: CarouselOptions(
+        height: 200,
+        autoPlay: true,
+        initialPage: 0,
+        onPageChanged: (index, reason) {
+          setState(() {
+            currentPage = index;
+          });
+        },
+        viewportFraction: 1,
+        autoPlayInterval: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -24,30 +51,35 @@ class _HomeBannerState extends State<HomeBanner> {
           bottom: 10,
           left: 0,
           right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              5,
-              (index) => GestureDetector(
-                onTap: () {
-                  setState(() {
-                    currentPage = index;
-                    _pageController.animateToPage(
-                      index,
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.ease,
-                    );
-                  });
-                },
-                child: Container(
-                  width: currentPage == index ? 45 : 15,
-                  height: 12,
-                  margin: EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: currentPage == index
-                        ? const Color.fromARGB(186, 54, 54, 54)
-                        : const Color.fromARGB(151, 255, 255, 255),
-                    borderRadius: BorderRadius.circular(7.5),
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                widget.bannerList.length,
+                (index) => GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      currentPage = index;
+                      _carouselController.animateToPage(index);
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    width: currentPage == index ? 45 : 15,
+                    height: 12,
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: currentPage == index
+                            ? Color.fromARGB(208, 35, 35, 35)
+                            : Colors.white,
+                        width: 3,
+                      ),
+                      color: currentPage == index
+                          ? const Color.fromARGB(208, 35, 35, 35)
+                          : const Color.fromARGB(196, 255, 255, 255),
+                      borderRadius: BorderRadius.circular(7.5),
+                    ),
                   ),
                 ),
               ),

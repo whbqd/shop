@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop/apis/Banner.dart';
 import 'package:shop/types/HomeBannerTypes.dart';
 
 import 'components/home_banner.dart';
@@ -22,17 +23,39 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<HomeBannerTypes> _bannerList = [
-    HomeBannerTypes(imageUrl: '', id: ''),
-    HomeBannerTypes(imageUrl: '', id: ''),
-    HomeBannerTypes(imageUrl: '', id: ''),
-  ];
+  List<HomeBannerTypes> _bannerList = [];
+  List<HomeCategoryTypes> _categoryList = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getBannerList();
+    getCategoryList();
+  }
+
+  Future<void> getBannerList() async {
+    List<HomeBannerTypes> bannerList = await getBannerListAsync();
+    if (!mounted) return;
+    setState(() {
+      _bannerList = bannerList;
+    });
+  }
+
+  Future<void> getCategoryList() async {
+    List<HomeCategoryTypes> categoryList = await getCategoryListAsync();
+    if (!mounted) return;
+    setState(() {
+      _categoryList = categoryList;
+    });
+  }
 
   List<Widget> getSlivers() {
     return [
       SliverToBoxAdapter(child: HomeBanner(bannerList: _bannerList)), // 轮播图
       SliverToBoxAdapter(child: SizedBox(height: 10)),
-      SliverToBoxAdapter(child: HomeCategory()), // 分类
+      SliverToBoxAdapter(
+        child: HomeCategory(categoryList: _categoryList),
+      ), // 分类
       SliverToBoxAdapter(child: SizedBox(height: 10)),
       SliverToBoxAdapter(child: HomeSpecialOffer()), // 特惠推荐
       SliverToBoxAdapter(child: SizedBox(height: 10)),
